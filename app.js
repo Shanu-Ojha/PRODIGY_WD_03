@@ -72,8 +72,10 @@ boxes.forEach((box) => {
 const aiMove = () => {
     msg.innerText = "AI is thinking...";
     msgContainer.classList.remove("hide");
-    
+
     setTimeout(() => {
+        if (checkWinner()) return;
+
         let bestMove = findBestMove();
         if (bestMove !== -1) {
             boxes[bestMove].innerText = "O";
@@ -91,6 +93,7 @@ const aiMove = () => {
         }
     }, 1000);
 };
+
 
 
 const findBestMove = () => {
@@ -116,17 +119,15 @@ const minimax = (isMaximizing) => {
     let isWinner = checkWinnerForMinimax();
     if (isWinner === "O") return 10;
     if (isWinner === "X") return -10;
-    if (count === 9) return 0;
+    if (isBoardFull()) return 0;
 
     if (isMaximizing) {
         let bestScore = -Infinity;
         for (let i = 0; i < boxes.length; i++) {
             if (boxes[i].innerText === "") {
                 boxes[i].innerText = "O";
-                count++;
                 let score = minimax(false);
                 boxes[i].innerText = "";
-                count--;
                 bestScore = Math.max(score, bestScore);
             }
         }
@@ -136,16 +137,22 @@ const minimax = (isMaximizing) => {
         for (let i = 0; i < boxes.length; i++) {
             if (boxes[i].innerText === "") {
                 boxes[i].innerText = "X";
-                count++;
                 let score = minimax(true);
                 boxes[i].innerText = "";
-                count--;
                 bestScore = Math.min(score, bestScore);
             }
         }
         return bestScore;
     }
 };
+
+const isBoardFull = () => {
+    for (let i = 0; i < boxes.length; i++) {
+        if (boxes[i].innerText === "") return false;
+    }
+    return true;
+};
+
 
 const checkWinnerForMinimax = () => {
     for (let pattern of winPatterns) {
@@ -159,6 +166,7 @@ const checkWinnerForMinimax = () => {
     }
     return null;
 };
+
 
 
 const gameDraw = () => {
